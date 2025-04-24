@@ -262,5 +262,109 @@ public class StudentDao extends Dao {
 		con.close();
 		return line;
 	}
+	public List<Student> findBySubject(int entYear, String classNum, String subjectCd, School school) throws Exception {
+	    List<Student> list = new ArrayList<>();
+	    Connection connection = getConnection();
+	    PreparedStatement statement = null;
+	    ResultSet rSet = null;
+
+	    // Join with test table to find students who have taken the specified subject
+	    String sql = "SELECT s.* FROM student s " +
+	                 "JOIN test t ON s.no = t.student_no " +
+	                 "WHERE s.school_cd = ? AND s.ent_year = ? " +
+	                 "AND s.class_num = ? AND t.subject_cd = ? " +
+	                 "ORDER BY s.no ASC";
+
+	    try {
+	        statement = connection.prepareStatement(sql);
+	        statement.setString(1, school.getCd());
+	        statement.setInt(2, entYear);
+	        statement.setString(3, classNum);
+	        statement.setString(4, subjectCd);
+	        rSet = statement.executeQuery();
+	        list = postFilter(rSet, school);
+	    } catch (Exception e) {
+	        throw e;
+	    } finally {
+	        if (statement != null) {
+	            try {
+	                statement.close();
+	            } catch (SQLException sqle) {
+	                throw sqle;
+	            }
+	        }
+	        if (connection != null) {
+	            try {
+	                connection.close();
+	            } catch (SQLException sqle) {
+	                throw sqle;
+	            }
+	        }
+	    }
+	    return list;
+	}
+	public List<Student> findByNo(String studentNo, School school) throws Exception {
+
+	    List<Student> list = new ArrayList<>();
+
+	    Connection connection = getConnection();
+
+	    PreparedStatement statement = null;
+
+	    ResultSet rSet = null;
+
+	    String sql = "SELECT * FROM student WHERE school_cd = ? AND no = ?";
+
+	    try {
+
+	        statement = connection.prepareStatement(sql);
+
+	        statement.setString(1, school.getCd());
+
+	        statement.setString(2, studentNo);
+
+	        rSet = statement.executeQuery();
+
+	        list = postFilter(rSet, school);
+
+	    } catch (Exception e) {
+
+	        throw e;
+
+	    } finally {
+
+	        if (statement != null) {
+
+	            try {
+
+	                statement.close();
+
+	            } catch (SQLException sqle) {
+
+	                throw sqle;
+
+	            }
+
+	        }
+
+	        if (connection != null) {
+
+	            try {
+
+	                connection.close();
+
+	            } catch (SQLException sqle) {
+
+	                throw sqle;
+
+	            }
+
+	        }
+
+	    }
+
+	    return list;
+
+	}
 
 }

@@ -55,7 +55,7 @@
 
 <!-- 登録して終了ボタン -->
 
-<input type="submit" value="登録して終了">
+<input type="submit" value="登録">
 </div>
 </form>
 <!-- 学生一覧へのリンク -->
