@@ -207,7 +207,7 @@ public class SubjectDao extends Dao {
 	    try {
 	        connection = getConnection();
 	        statement = connection.prepareStatement(
-	            "DELETE FROM SUBJECT WHERE CD = ? AND NAME = ?"
+	            "DELETE FROM SUBJECT WHERE CD = ? AND SCHOOL_CD = ?"
 	        );
 	        statement.setString(1, no);
 	        statement.setString(2, schoolCd);

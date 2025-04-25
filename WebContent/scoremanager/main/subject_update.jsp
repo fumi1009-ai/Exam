@@ -12,7 +12,7 @@
 
 <form method="post" action="SubjectUpdateExecute.action">
 <div class="border mx-3 mb-3 py-3 px-4 rounded" id="filter">
-<div class="mb-3">
+</div>
 
 	<div class="mb-3">
 <label class="form-label" for="no">科目コード</label><br>
