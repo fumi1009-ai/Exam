@@ -1,31 +1,17 @@
 package bean;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Map;
 
 public class TestListSubject implements Serializable{
-
 	private int entYear;
-
 	private String studentNo;
-
 	private String studentName;
-
 	private String classNum;
+	private Map<Integer, Integer> points;
 
-	/** 回数とその回の得点 */
-	private Map<Integer,Integer> points = new HashMap<>();
-
-
-	/**
-	 * 年度を取得
-	 *
-	 * @return 年度
-	 *
-	 */
-	public int getEntYaer(){
-		return entYear;
+	public int getEntYear(){
+	return entYear;
 	}
 
 	public void setEntYear(int entYear){
@@ -40,7 +26,7 @@ public class TestListSubject implements Serializable{
 		this.studentNo = studentNo;
 	}
 
-	public String getStudentname(){
+	public String getStudentName(){
 		return studentName;
 	}
 
@@ -49,51 +35,23 @@ public class TestListSubject implements Serializable{
 	}
 
 	public String getClassNum(){
-
 		return classNum;
 	}
-
 	public void setClassNum(String classNum){
 		this.classNum =classNum;
 	}
 
-	public Map<Integer,Integer> getPoints() {
-		return points;
-	}
+    public Map<Integer, Integer> getPoints() {
+        return points;
+    }
 
-	public void setPoints(Map<Integer,Integer> points) {
-		this.points = points;
-	}
+    public void setPoints(Map<Integer, Integer> points2) {
+        this.points = points2;
+    }
 
-	/**
-	 * キー（テスト回数）から値（点数）を取得するメソッド
-	 * @param key テスト回数：int
-	 * @return 点数（String）
-	 */
-	public String getPoint(int key) {
+	public void setNo(int int1) {
+		// TODO 自動生成されたメソッド・スタブ
 
-		// Mapインスタンスの初期化
-		Map<Integer, Integer> map = new HashMap<Integer, Integer>();
-		// pointsフィールドから値をゲット
-		map = getPoints();
-		// キーのテスト回数から値の点数を返却
-		return Integer.toString(map.get(key));
-	}
-
-	/**
-	 * pointsフィールドにMapでテスト回数と点数をセットするメソッド
-	 * @param key テスト回数：int
-	 * @param value 点数：int
-	 */
-	public void putPoint(int key, int value) {
-
-		// Mapインスタンスの初期化
-		Map<Integer, Integer>map = new HashMap<Integer, Integer>();
-		// pointsフィールドから値をゲット
-		map = getPoints();
-		// mapにテスト回数と点数を格納
-		map.put(key, value);
-		// pointsフィールドにセット
-		setPoints(map);
 	}
 }
+

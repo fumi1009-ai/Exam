@@ -3,23 +3,23 @@ package bean;
 import java.io.Serializable;
 
 /**
-* JavaBean representing a Subject
-*/
+ * JavaBean representing a Subject
+ */
 public class Subject implements Serializable {
 
-    private String schoolcd; // 学校コード: String
+    private String school; // 学校コード: String
     private String cd;       // 科目コード: String
     private String name;     // 科目名: String
 
     /**
      * Getter and Setter for schoolcd
      */
-    public String getSchoolCd() {
-        return schoolcd;
+    public String getSchool() {
+        return school;
     }
 
-    public void setSchoolCd(String schoolcd) {
-        this.schoolcd = schoolcd;
+    public void setSchoolCd(String school) {
+        this.school = school;
     }
 
     /**
