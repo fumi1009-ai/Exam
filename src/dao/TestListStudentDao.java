@@ -7,50 +7,66 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import bean.Student;
 import bean.TestListStudent;
 
 public class TestListStudentDao extends Dao {
 
-    private String baseSql = "SELECT s.name as subject_name, s.cd as subject_cd, " +
-                           "t.no as num, t.point as point " +
-                           "FROM test t " +
-                           "JOIN subject s ON t.subject_cd = s.cd " +
-                           "WHERE t.student_no = ? " +
-                           "ORDER BY s.cd, t.no";
+	// arraylistへの格納処理
+	public List<TestListStudent> postFilter(ResultSet rSet) throws Exception {
+		List<TestListStudent> list = new ArrayList<>();
+		try{
+			// 渡された値をlistへセット
+			while (rSet.next()){
+				TestListStudent tl_student = new TestListStudent();
+				tl_student.setSubjectName(rSet.getString("name"));
+				tl_student.setSubjectCd(rSet.getString("subject_cd"));
+				tl_student.setNum(rSet.getInt("no"));
+				tl_student.setPoint(rSet.getInt("point"));
+				list.add(tl_student);
+			}
+		} catch (SQLException | NullPointerException e){ e.printStackTrace();}
+		return list;
+	}
 
-    public List<TestListStudent> findByStudent(String studentNo) throws Exception {
-        List<TestListStudent> list = new ArrayList<>();
-        Connection connection = null;
-        PreparedStatement statement = null;
-        ResultSet rs = null;
+	// 選択学生のデータ取得
+	public List<TestListStudent> filter(Student student) throws Exception {
+		// 定義
+		List<TestListStudent> list = new ArrayList<>();
+	    Connection connection = getConnection();
+	    PreparedStatement statement = null;
+	    ResultSet set = null;
+	    try {
+	    	// sql処理
+	        statement = connection.prepareStatement("SELECT subject.name, test.subject_cd, test.no, test.point "
+	        									+ "FROM test LEFT JOIN subject "
+	        									+ "ON test.subject_cd = subject.cd WHERE test.student_no = ? "
+	        									+ "ORDER BY test.subject_cd, test.no"
+	        									);
+	        statement.setString(1, student.getNo());
+	        set = statement.executeQuery();
+	        list = postFilter(set);
 
-        try {
-            connection = getConnection();
-            statement = connection.prepareStatement(baseSql);
-            statement.setString(1, studentNo);
-            rs = statement.executeQuery();
-            list = postFilter(rs);
-        } catch (SQLException e) {
-            throw e;
-        } finally {
-            // Close resources
-            if (rs != null) try { rs.close(); } catch (SQLException e) { e.printStackTrace(); }
-            if (statement != null) try { statement.close(); } catch (SQLException e) { e.printStackTrace(); }
-            if (connection != null) try { connection.close(); } catch (SQLException e) { e.printStackTrace(); }
-        }
-        return list;
-    }
+	    } catch (Exception e) {
+	        throw e;
+	    } finally {
+	        if (statement != null) {
+	            try {
+	                statement.close();
+	            } catch (SQLException sqle) {
+	                throw sqle;
+	            }
+	        }
+	        if (connection != null) {
+	            try {
+	                connection.close();
+	            } catch (SQLException sqle) {
+	                throw sqle;
+	            }
+	        }
+	    }
 
-    private List<TestListStudent> postFilter(ResultSet rs) throws Exception {
-        List<TestListStudent> list = new ArrayList<>();
-        while (rs.next()) {
-            TestListStudent test = new TestListStudent();
-            test.setSubjectName(rs.getString("subject_name"));
-            test.setSubjectCd(rs.getString("subject_cd"));
-            test.setNum(rs.getInt("num"));
-            test.setPoint(rs.getInt("point"));
-            list.add(test);
-        }
-        return list;
-    }
+	    return list;
+	}
 }
+
