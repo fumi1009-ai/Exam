@@ -2,16 +2,18 @@ package scoremanager.main;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.HashMap; // HashMap の import を復活
 import java.util.List;
-import java.util.Map;
+import java.util.Map; // Map の import を復活
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+// import bean.ClassNum; // ClassNumDao で使用
 import bean.Subject;
 import bean.Teacher;
+// import bean.Test; // 不要
 import bean.TestListSubject;
 import dao.ClassNumDao;
 import dao.SubjectDao;
@@ -22,75 +24,75 @@ public class TestListSubjectExecuteAction extends Action {
 
 	@Override
 	public void execute(HttpServletRequest req, HttpServletResponse res) throws Exception {
-		// TODO 自動生成されたメソッド・スタブ
 
-		//ローカル変数の宣言1
-		HttpSession session = req.getSession();//セッション
-		Teacher teacher = (Teacher)session.getAttribute("user");
-		int entYear = 0; // 入力された入学年度
-		String classNum = ""; // 入力されたクラス番号
-		String subject = ""; //入力された科目
-		String subjectName = ""; // 科目名
-		TestListSubjectDao tlsDao = new TestListSubjectDao();
-		SubjectDao subjectDao = new SubjectDao();
-		ClassNumDao cNumDao = new ClassNumDao(); // クラス番号Dao
-		LocalDate todaysDate = LocalDate.now(); // LocalDateインスタンスを取得
-		int year = todaysDate.getYear(); // 現在の年を取得
-		Map<String, String> errors = new HashMap<>(); // エラーメッセージ
+		HttpSession session = req.getSession(false);
+		Teacher teacher = (Teacher) session.getAttribute("user");
 
-		// リクエストパラメーターの取得2
-		entYear = Integer.parseInt(req.getParameter("f1"));
-		classNum = req.getParameter("f2");
-		subject = req.getParameter("f3");
-
-		// DBからの取得3
-		// ビジネスロジック4
-		if (entYear == 0 || classNum.equals("0") || subject.equals("0")) { // 入学年度、クラス番号、科目のいずれかが未選択の場合
-			errors.put("1", "入学年度とクラス番号と科目を選択してください");
-			// リクエストにエラーメッセージをセット
-			req.setAttribute("errors", errors);
-		} else {
-			List<TestListSubject> tlslist = tlsDao.filter(entYear, classNum, subjectDao.get(subject, teacher.getSchool()), teacher.getSchool());
-			// 科目名を取得
-			subjectName = subjectDao.get(subject, teacher.getSchool()).getName();
-			// リクエストに科目別一覧をセット
-			req.setAttribute("tlslist", tlslist);
-			// リクエストに科目名をセット
-			req.setAttribute("subject_name", subjectName);
-		}
-		//DBからデータ取得3
-		List<String>cNumlist = cNumDao.filter(teacher.getSchool()); //クラス情報
-		List<Subject>list = subjectDao.filter(teacher.getSchool()); //科目情報
-
-		//ビジネスロジック4
-		// リストを初期化
 		List<Integer> entYearSet = new ArrayList<>();
-		// 10年前から10年後まで年をリストに追加
-		for (int i = year - 10; i < year + 11; i++) {
+		List<String> classNumList = null;
+		List<Subject> subjectList = null;
+		Map<String, String> errors = new HashMap<>(); // コメントアウト解除
+		ClassNumDao cNumDao = new ClassNumDao();
+		SubjectDao subDao = new SubjectDao();
+		TestListSubjectDao tlsDao = new TestListSubjectDao();
+		LocalDate todaysDate = LocalDate.now();
+		int year = todaysDate.getYear();
+
+		for (int i = year - 10; i <= year + 1; i++) {
 			entYearSet.add(i);
 		}
 
-		// レスポンス値をセット6
-		// リクエストに入学年度をセット
-		req.setAttribute("f1", entYear);
-		// リクエストにクラス番号をセット
-		req.setAttribute("f2", classNum);
-		// リクエストに科目をセット
-		req.setAttribute("f3", subject);
-		//リクエストにクラス情報リストをセット
-		req.setAttribute("cNumlist", cNumlist);
-		//リクエストに科目情報リストをセット
-		req.setAttribute("list", list);
-		//リクエストに入学年度リストをセット
-		req.setAttribute("entYearSet", entYearSet);
+		classNumList = cNumDao.filter(teacher.getSchool());
+		subjectList = subDao.filter(teacher.getSchool());
 
-		// フォワード7
-		if (errors.isEmpty()) { // エラーが出なかった場合
-			req.getRequestDispatcher("test_list_subject.jsp").forward(req , res);
-		}else{ //エラーが出た場合
-			req.getRequestDispatcher("test_list.jsp").forward(req , res);
+		String entYearStr = req.getParameter("f1");
+		String classNumStr = req.getParameter("f2");
+		String subjectCd = req.getParameter("f3");
+
+		System.out.println("入学年度: " + entYearStr);
+		System.out.println("クラス: " + classNumStr);
+		System.out.println("科目コード: " + subjectCd);
+
+		int entYear = Integer.parseInt(entYearStr);
+		Subject filterSubject = subDao.get(subjectCd, teacher.getSchool());
+		List<TestListSubject> subjectTests = null;
+
+
+		// idk what i'm doing here
+		if (filterSubject != null) {
+			subjectTests = tlsDao.filter(entYear, classNumStr, filterSubject, teacher.getSchool());
+		} else {
+			if (subjectCd != null && !subjectCd.isEmpty() && !subjectCd.equals("0")) {
+				errors.put("filter", "指定された科目が存在しません。");
+			}
 		}
 
+		System.out.println("entYear (int): " + entYear);
+		System.out.println("filterSubject: " + (filterSubject != null ? filterSubject.getName() : "null"));
+		System.out.println("total count: " + (subjectTests != null ? subjectTests.size() : "null"));
+		System.out.println("subjectTests: " + subjectTests);
+
+		if (entYearStr == null || entYearStr.isEmpty() || entYearStr.equals("0") || // entYear == "0" を修正
+			classNumStr == null || classNumStr.isEmpty() || classNumStr.equals("0") ||
+			subjectCd == null || subjectCd.isEmpty() || subjectCd.equals("0")) {
+			errors.put("filter", "入学年度、クラス、科目を選択してください。"); // エラーメッセージのキーを filter に変更
+		}
+
+		// JSP に渡す属性を設定
+		req.setAttribute("ent_year_set", entYearSet);
+		req.setAttribute("class_num_set", classNumList);
+		req.setAttribute("subject_set", subjectList);
+		req.setAttribute("f1", entYearStr);
+		req.setAttribute("f2", classNumStr);
+		req.setAttribute("f3", subjectCd);
+		req.setAttribute("selectedSubject", filterSubject);
+		req.setAttribute("subjectTests", subjectTests);
+		req.setAttribute("errors", errors); // 復活
+
+		// 検索タイプを設定
+		req.setAttribute("testResults", "subject");
+
+		req.getRequestDispatcher("test_list.jsp").forward(req, res);
 	}
 
 }
